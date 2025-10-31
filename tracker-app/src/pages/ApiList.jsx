@@ -1,48 +1,63 @@
 import React, { useState, useEffect } from 'react';
 import ApiItemCard from '../components/ApiItemCard';
-import { Container } from 'react-bootstrap';
+import StatusEditForm from '../components/StatusEditForm'; // Importar el nuevo formulario
+import Container from 'react-bootstrap/Container';
 import Button from 'react-bootstrap/Button';
 
 const API_URL = 'https://api-incident.onrender.com/api/incidents';
 
-
 const ApiList = ({ onAddItem }) => {
-    // 1. Hook para almacenar los datos de la API
     const [incidents, setIncidents] = useState([]);
-    // 2. Hook para manejar el estado de carga (loading)
     const [loading, setLoading] = useState(true);
-    // 3. Hook para manejar posibles errores
     const [error, setError] = useState(null);
-
-    // 4. Hook de efecto para realizar la llamada a la API
-    useEffect(() => {
-        const fetchIncidents = async () => {
-            try {
-                const response = await fetch(API_URL);
-                
-                // Manejo básico de errores HTTP (ej. 404 o 500)
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                
-                // Asumiendo que la respuesta es un array de incidentes directamente
-                setIncidents(data);
-                setError(null);
-
-            } catch (err) {
-                console.error("Error al cargar los datos:", err);
-                setError("Error al cargar los incidentes. Por favor, inténtelo de nuevo.");
-
-            } finally {
-                // Independientemente del éxito o fracaso, terminamos la carga
-                setLoading(false);
+    // Hook para rastrear el ID del incidente que se está editando
+    const [editingId, setEditingId] = useState(null); 
+    
+    // Función para recargar los datos (útil después de un DELETE o POST)
+    const fetchIncidents = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const response = await fetch(API_URL);
+            if (!response.ok) {
+                throw new Error(`Error en la API: ${response.statusText || response.status}`);
             }
-        };
+            const data = await response.json();
+            setIncidents(data);
+        } catch (err) {
+            console.error("Error al cargar los datos:", err);
+            setError(`Error al cargar los incidentes. Detalles: ${err.message || "Error de red/CORS"}`);
+        } finally {
+            setLoading(false);
+        }
+    };
 
+    // Cargar datos al montar el componente
+    useEffect(() => {
         fetchIncidents();
-    }, []); // El array vacío [] asegura que el efecto se ejecute solo una vez al montar el componente
+    }, []); 
+
+    // --- MANEJO DE ACCIONES ---
+    
+    // Maneja la acción de eliminar (actualiza el estado local)
+    const handleDeleteSuccess = (deletedId) => {
+        // Filtra el incidente eliminado del estado local
+        setIncidents(prev => prev.filter(item => (item._id || item.id) !== deletedId));
+    };
+
+    // Maneja el éxito de la actualización del estado
+    const handleUpdateSuccess = (updatedIncident) => {
+        // Reemplaza el incidente antiguo con el incidente actualizado
+        setIncidents(prev => prev.map(item => 
+            (item._id || item.id) === (updatedIncident._id || updatedIncident.id)
+                ? updatedIncident
+                : item
+        ));
+        setEditingId(null); // Sale del modo de edición
+    };
+    
+    // Obtiene el incidente actual que se está editando
+    const incidentToEdit = incidents.find(item => (item._id || item.id) === editingId);
 
     // --- Lógica de Renderizado ---
     
@@ -55,14 +70,30 @@ const ApiList = ({ onAddItem }) => {
     } else if (incidents.length === 0) {
         content = <p className="text-center mt-5 text-muted">No se encontraron incidentes.</p>;
     } else {
-        content = (
-            <div className="d-flex flex-column gap-3">
-                {incidents.map(item => (
-                    // Usamos _id (común en APIs) o id si existe
-                    <ApiItemCard key={item._id || item.id} item={item} /> 
-                ))}
-            </div>
-        );
+        // Si hay un ID de edición, muestra el formulario de edición
+        if (editingId && incidentToEdit) {
+            content = (
+                <StatusEditForm 
+                    incident={incidentToEdit}
+                    onCancel={() => setEditingId(null)}
+                    onUpdateSuccess={handleUpdateSuccess}
+                />
+            );
+        } else {
+            // Muestra la lista normal
+            content = (
+                <div className="d-flex flex-column gap-3">
+                    {incidents.map(item => (
+                        <ApiItemCard 
+                            key={item._id || item.id} 
+                            item={item} 
+                            onEditStatus={setEditingId} // Inicia la edición pasando el ID
+                            onDelete={handleDeleteSuccess} // Maneja la eliminación
+                        /> 
+                    ))}
+                </div>
+            );
+        }
     }
 
     return (
