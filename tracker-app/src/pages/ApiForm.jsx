@@ -4,8 +4,9 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import { API_URL } from '../config';
 
-const API_CREATE_URL = 'https://api-incident.onrender.com/api/incidents';
+//const API_CREATE_URL = 'https://api-incident.onrender.com/api/incidents';
 
 // Función para formatear la fecha y hora actuales
 const formatDateTime = (date) => {
@@ -52,7 +53,7 @@ const ApiForm = ({ onGoBack }) => {
                 severity: formData.severity,
             };
 
-            const response = await fetch(API_CREATE_URL, {
+            const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
@@ -81,7 +82,7 @@ const ApiForm = ({ onGoBack }) => {
                 <h1 className="h5 fw-bold mb-0 text-dark">Add New Item</h1>
             </header>
 
-            {/* 🛑 CORRECCIÓN: Aumentar el paddingBottom para visualizar los últimos campos. */}
+            {/* CORRECCIÓN: Aumentar el paddingBottom para visualizar los últimos campos. */}
             <main 
                 className="flex-grow-1 overflow-y-auto p-3" 
                 // Establecemos un relleno grande para garantizar que el último campo no quede cubierto.
@@ -129,23 +130,7 @@ const ApiForm = ({ onGoBack }) => {
                             <option>LOW</option>
                         </Form.Select>
                     </Form.Group>
-
-                    {/* Últimos dos campos cubiertos por el footer: */}
-                   {/*<Row className="g-3">
-                        <Col>
-                            <Form.Group controlId="created-at">
-                                <Form.Label className="small fw-medium">Created At</Form.Label>
-                                <Form.Control type="text" readOnly value={formData.createdAt} className="bg-light text-muted" />
-                            </Form.Group>
-                        </Col>
-                        <Col>
-                            <Form.Group controlId="updated-at">
-                                <Form.Label className="small fw-medium">Updated At</Form.Label>
-                                <Form.Control type="text" readOnly value={formData.updatedAt} className="bg-light text-muted" />
-                            </Form.Group>
-                        </Col>
-                    </Row>
-                    */}
+                   
                 </Form>
             </main>
 
