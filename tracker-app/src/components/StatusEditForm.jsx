@@ -6,10 +6,11 @@ import Col from 'react-bootstrap/Col';
 import { API_URL } from '../config/config.js';
 
 const StatusEditForm = ({ incident, onCancel, onUpdateSuccess }) => {
-    
     const id = incident._id || incident.id;
+
+    // Inicializar el estado con los valores del incidente recibido
     const [newStatus, setNewStatus] = useState(incident.status);
-    const [message, setMessage] = useState(''); // NUEVO
+    const [message, setMessage] = useState(incident.message || ''); // valor inicial del backend
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState(null);
 
@@ -20,6 +21,9 @@ const StatusEditForm = ({ incident, onCancel, onUpdateSuccess }) => {
         // Si cambia a otro estado distinto de CLOSED, limpiar el mensaje
         if (value !== 'CLOSED') {
             setMessage('');
+        } else if (incident.message) {
+            // Si vuelve a CLOSED, restaurar el mensaje original del backend
+            setMessage(incident.message);
         }
     };
 
@@ -29,7 +33,7 @@ const StatusEditForm = ({ incident, onCancel, onUpdateSuccess }) => {
         setError(null);
         
         try {
-            // NUEVO: incluir message solo si el estado es CLOSED
+            // Construir el payload
             const payload = { status: newStatus };
             if (newStatus === 'CLOSED' && message.trim() !== '') {
                 payload.message = message;
@@ -76,7 +80,7 @@ const StatusEditForm = ({ incident, onCancel, onUpdateSuccess }) => {
                     </Form.Select>
                 </Form.Group>
 
-                {/* NUEVO: campo condicional para message */}
+                {/* Campo condicional para message */}
                 {newStatus === 'CLOSED' && (
                     <Form.Group controlId="message" className="mb-3">
                         <Form.Label className="small fw-medium">Mensaje de cierre</Form.Label>
@@ -110,7 +114,7 @@ const StatusEditForm = ({ incident, onCancel, onUpdateSuccess }) => {
                             className="w-100" 
                             disabled={
                                 isSubmitting || 
-                                (newStatus === incident.status && message.trim() === '')
+                                (newStatus === incident.status && message.trim() === (incident.message || ''))
                             }
                         >
                             {isSubmitting ? 'Guardando...' : 'Guardar'}
