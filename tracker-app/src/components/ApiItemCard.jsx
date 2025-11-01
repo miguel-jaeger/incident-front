@@ -2,8 +2,9 @@ import React from 'react';
 import Card from 'react-bootstrap/Card';
 import Badge from 'react-bootstrap/Badge';
 import Button from 'react-bootstrap/Button';
+import { API_URL } from '../config/config.js';
 
-const API_BASE_URL = 'https://api-incident.onrender.com/api/incidents';
+
 
 // Aceptamos las funciones onEditStatus y onDelete desde el padre (ApiList)
 const ApiItemCard = ({ item, onEditStatus, onDelete }) => {
@@ -34,7 +35,7 @@ const ApiItemCard = ({ item, onEditStatus, onDelete }) => {
             // Usamos _id o id (depende de tu API)
             const id = item._id || item.id; 
             
-            const response = await fetch(`${API_BASE_URL}/${id}`, {
+            const response = await fetch(`${API_URL}/${id}`, {
                 method: 'DELETE',
             });
 
@@ -62,6 +63,9 @@ const ApiItemCard = ({ item, onEditStatus, onDelete }) => {
                     </Card.Title>
                     <Card.Text className="text-muted small" style={{ WebkitLineClamp: 2, overflow: 'hidden', display: '-webkit-box', WebkitBoxOrient: 'vertical' }}>
                         {item.description}
+                    </Card.Text>
+                     <Card.Text className="text-muted small" style={{ WebkitLineClamp: 2, overflow: 'hidden', display: '-webkit-box', WebkitBoxOrient: 'vertical' }}>
+                        {item.message}
                     </Card.Text>
                     <div className="d-flex align-items-center gap-2 mt-3">
                         <Badge bg={status.variant} className="py-1 px-2">{status.text}</Badge>

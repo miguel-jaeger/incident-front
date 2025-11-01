@@ -3,19 +3,24 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import { API_URL } from '../config/config.js';
 
-const API_BASE_URL = 'https://api-incident.onrender.com/api/incidents';
-
-// Recibe el incidente actual, y funciones para cerrar y actualizar la lista
 const StatusEditForm = ({ incident, onCancel, onUpdateSuccess }) => {
     
     const id = incident._id || incident.id;
     const [newStatus, setNewStatus] = useState(incident.status);
+    const [message, setMessage] = useState(''); // NUEVO
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState(null);
 
     const handleStatusChange = (e) => {
-        setNewStatus(e.target.value);
+        const value = e.target.value;
+        setNewStatus(value);
+
+        // Si cambia a otro estado distinto de CLOSED, limpiar el mensaje
+        if (value !== 'CLOSED') {
+            setMessage('');
+        }
     };
 
     const handleSubmit = async (e) => {
@@ -24,12 +29,16 @@ const StatusEditForm = ({ incident, onCancel, onUpdateSuccess }) => {
         setError(null);
         
         try {
-            const response = await fetch(`${API_BASE_URL}/${id}/status`, {
+            // NUEVO: incluir message solo si el estado es CLOSED
+            const payload = { status: newStatus };
+            if (newStatus === 'CLOSED' && message.trim() !== '') {
+                payload.message = message;
+            }
+
+            const response = await fetch(`${API_URL}/${id}/status`, {
                 method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ status: newStatus }),
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
             });
 
             if (!response.ok) {
@@ -37,8 +46,6 @@ const StatusEditForm = ({ incident, onCancel, onUpdateSuccess }) => {
             }
 
             const updatedIncident = await response.json();
-
-            // Si tiene éxito, notifica al padre y cierra el formulario
             onUpdateSuccess(updatedIncident); 
             onCancel();
 
@@ -58,16 +65,41 @@ const StatusEditForm = ({ incident, onCancel, onUpdateSuccess }) => {
             <Form onSubmit={handleSubmit}>
                 <Form.Group controlId="status" className="mb-3">
                     <Form.Label className="small fw-medium">Nuevo Estado</Form.Label>
-                    <Form.Select value={newStatus} onChange={handleStatusChange} disabled={isSubmitting}>
+                    <Form.Select 
+                        value={newStatus} 
+                        onChange={handleStatusChange} 
+                        disabled={isSubmitting}
+                    >
                         <option>OPEN</option>
                         <option>IN_PROGRESS</option>
                         <option>CLOSED</option>
                     </Form.Select>
                 </Form.Group>
 
+                {/* NUEVO: campo condicional para message */}
+                {newStatus === 'CLOSED' && (
+                    <Form.Group controlId="message" className="mb-3">
+                        <Form.Label className="small fw-medium">Mensaje de cierre</Form.Label>
+                        <Form.Control
+                            as="textarea"
+                            rows={3}
+                            placeholder="Describe el motivo del cierre..."
+                            value={message}
+                            onChange={(e) => setMessage(e.target.value)}
+                            required
+                            disabled={isSubmitting}
+                        />
+                    </Form.Group>
+                )}
+
                 <Row className="g-2">
                     <Col>
-                        <Button variant="secondary" onClick={onCancel} className="w-100" disabled={isSubmitting}>
+                        <Button 
+                            variant="secondary" 
+                            onClick={onCancel} 
+                            className="w-100" 
+                            disabled={isSubmitting}
+                        >
                             Cancelar
                         </Button>
                     </Col>
@@ -76,7 +108,10 @@ const StatusEditForm = ({ incident, onCancel, onUpdateSuccess }) => {
                             variant="primary" 
                             type="submit" 
                             className="w-100" 
-                            disabled={isSubmitting || newStatus === incident.status} // Deshabilitar si no hay cambios
+                            disabled={
+                                isSubmitting || 
+                                (newStatus === incident.status && message.trim() === '')
+                            }
                         >
                             {isSubmitting ? 'Guardando...' : 'Guardar'}
                         </Button>

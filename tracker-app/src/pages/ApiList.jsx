@@ -3,8 +3,7 @@ import ApiItemCard from '../components/ApiItemCard';
 import StatusEditForm from '../components/StatusEditForm'; // Importar el nuevo formulario
 import Container from 'react-bootstrap/Container';
 import Button from 'react-bootstrap/Button';
-
-const API_URL = 'https://api-incident.onrender.com/api/incidents';
+import { API_URL } from '../config/config.js';
 
 const ApiList = ({ onAddItem }) => {
     const [incidents, setIncidents] = useState([]);

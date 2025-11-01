@@ -4,7 +4,7 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import { API_URL } from '../config';
+import { API_URL } from '../config/config.js';
 
 // Función para formatear la fecha y hora actuales
 const formatDateTime = (date) => {
