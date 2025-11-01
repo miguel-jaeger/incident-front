@@ -61,12 +61,16 @@ const ApiItemCard = ({ item, onEditStatus, onDelete }) => {
                     <Card.Title as="h5" className="text-dark">
                         {item.title}
                     </Card.Title>
+                    {item.description && (
                     <Card.Text className="text-muted small" style={{ WebkitLineClamp: 2, overflow: 'hidden', display: '-webkit-box', WebkitBoxOrient: 'vertical' }}>
-                        {item.description}
+                        <b>Descripción:</b> {item.description}
                     </Card.Text>
+                    )}
+                    {item.message && (
                      <Card.Text className="text-muted small" style={{ WebkitLineClamp: 2, overflow: 'hidden', display: '-webkit-box', WebkitBoxOrient: 'vertical' }}>
-                        {item.message}
+                        <b>Razones del rechazo:</b> {item.message}
                     </Card.Text>
+                    )}
                     <div className="d-flex align-items-center gap-2 mt-3">
                         <Badge bg={status.variant} className="py-1 px-2">{status.text}</Badge>
                         <Badge bg={severity.variant} className="py-1 px-2">{severity.text}</Badge>
