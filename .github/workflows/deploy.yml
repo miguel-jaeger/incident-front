@@ -1,4 +1,4 @@
-name: Deploy React Frontend to Render
+name: Deploy to Render
 
 on:
   push:
@@ -8,17 +8,8 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
+    
     steps:
-      - uses: actions/checkout@v2
-
-      - name: Install dependencies
-        working-directory: tracker-app
-        run: npm install
-
-      - name: Build
-        working-directory: tracker-app
-        run: npm run build
-
       - name: Trigger Render Deploy
-        run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: |
+          curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
