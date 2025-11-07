@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+oimport React, { useState } from 'react';
 import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
@@ -122,9 +122,9 @@ const ApiForm = ({ onGoBack }) => {
                             onChange={handleChange}
                             disabled={isSubmitting}
                         >
-                            <option>OPEN</option>
-                            <option>IN_PROGRESS</option>
-                            <option>CLOSED</option>
+                            <option>ABIERTO</option>
+                            <option>PROGRESO</option>
+                            <option>CERRADO</option>
                         </Form.Select>
                     </Form.Group>
 
