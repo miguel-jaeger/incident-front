@@ -53,7 +53,7 @@ const ApiForm = ({ onGoBack }) => {
                 severity: formData.severity,
             };
 
-            if (formData.status === 'CLOSED' && formData.message.trim() !== '') {
+            if (formData.status === 'CERRADO' && formData.message.trim() !== '') {
                 payload.message = formData.message;
             }
 
@@ -135,20 +135,20 @@ const ApiForm = ({ onGoBack }) => {
                             onChange={handleChange}
                             disabled={isSubmitting}
                         >
-                            <option>HIGH</option>
-                            <option>MEDIUM</option>
-                            <option>LOW</option>
+                            <option>ALTO</option>
+                            <option>MEDIO</option>
+                            <option>BAJO</option>
                         </Form.Select>
                     </Form.Group>
 
                     {/* NUEVO: campo condicional para message */}
-                    {formData.status === 'CLOSED' && (
+                    {formData.status === 'CERRADO' && (
                         <Form.Group controlId="message">
                             <Form.Label className="small fw-medium">Message</Form.Label>
                             <Form.Control
                                 as="textarea"
                                 rows={3}
-                                placeholder="Enter closing message..."
+                                placeholder="Ingrese mensaje..."
                                 required
                                 value={formData.message}
                                 onChange={handleChange}
