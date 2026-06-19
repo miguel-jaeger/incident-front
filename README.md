@@ -1,2 +1,2 @@
 # incident-front
-probando algo nuevo
+probando algo nuevo para la clase
